@@ -1,7 +1,9 @@
 pub mod constants;
 
+use pyo3::{pymodule,wrap_pyfunction,pyfunction, Python, PyResult};
+use pyo3::types::PyModule;
 use crate::constants::{country_from_range, manufacturer_from_code};
-use crate::constants::{COUNTRY_CODES, YEAR_CHARS};
+use crate::constants::YEAR_CHARS;
 use ascii::AsAsciiStr;
 use ascii::AsciiChar;
 use ascii::AsciiString;
@@ -11,7 +13,7 @@ use std::fmt::{Display, Formatter};
 pub struct VIN(pub AsciiString);
 
 impl VIN {
-    fn isLess500(&self) -> bool {
+    fn is_less_500(&self) -> bool {
         if self.0[2..3].as_ascii_str().unwrap().to_ascii_string() == "9" {
             true
         } else {
@@ -51,12 +53,12 @@ impl Into<DecodedVIN> for VIN {
             vds_code: value[3..8].into(),
             year: *value.get(9).unwrap(),
             plant_code: value[10..11].into(),
-            manufacturer_code: if self.isLess500() {
+            manufacturer_code: if self.is_less_500() {
                 value[11..13].into()
             } else {
                 value[0..3].into()
             },
-            serial_number: if self.isLess500() {
+            serial_number: if self.is_less_500() {
                 value[14..17].into()
             } else {
                 value[12..17].into()
@@ -66,6 +68,7 @@ impl Into<DecodedVIN> for VIN {
 }
 
 //This is the only code that actually uses external data/lookup tables
+#[allow(unused)]
 impl Display for DecodedVIN {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "VIN: {}", self.source_vin.0);
@@ -76,4 +79,19 @@ impl Display for DecodedVIN {
         //writeln!(f,"PLANT: {}",self.plant_code);
         Ok(())
     }
+}
+
+#[pymodule]
+fn vin_extract(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(render_vin, m)?)?;
+
+    Ok(())
+}
+
+#[pyfunction]
+fn render_vin(vin:&str) {
+    let vin:VIN =  vin.into();
+    let decoded_vin: DecodedVIN = vin.into();
+    println!("{:?}", decoded_vin);
+    println!("{}", decoded_vin);
 }

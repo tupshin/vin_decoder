@@ -1,4 +1,3 @@
-use ascii::{AsAsciiStr, AsciiString};
 use vin_extract::{DecodedVIN, VIN};
 
 fn main() {

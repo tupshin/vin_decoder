@@ -1,6 +1,4 @@
-use ascii::AsciiString;
-use std::ops::{Range, RangeInclusive};
-
+use std::ops::RangeInclusive;
 
 
 pub static YEAR_CHARS: &str = "ABCDEFGHJKLMNPRSTVWXY1234567890";
@@ -121,7 +119,7 @@ pub fn country_from_range(value: &str) -> String {
     for rng in &COUNTRY_CODES {
         //println!("{} {:?}", value, rng);
         if rng.0.contains(&value) {
-            return (rng.1.to_string());
+            return rng.1.to_string()
         }
     }
     unimplemented!()
@@ -671,10 +669,9 @@ pub static MANUFACTURER_CODES: [(&str, &str); 538] = [
 ];
 
 pub fn manufacturer_from_code(value: &str) -> String {
-        let code = 94;
         for code in &MANUFACTURER_CODES {
                 if code.0 == value  {
-                        return (code.1.to_string());
+                        return code.1.to_string()
                 }
         }
         unimplemented!()
